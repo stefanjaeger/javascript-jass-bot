@@ -1,46 +1,67 @@
 'use strict';
 
-class WebSocketHandler {
-    constructor(url) {
-        this.socket = new WebSocket(`ws://${url}`);
+class Dispatcher {
+    constructor() {
+        this.listeners = {};
     }
 
-    onMessage(fn) {
-        this.socket.onmessage = function(event) {
-            console.log('receiving', event.data);
-            fn(JSON.parse(event.data));
-        };
+    emit(action, payload) {
+        if (!this.listeners[action]) {
+            console.error(`no listener attachted for action ${action}`);
+            return;
+        }
+        this.listeners[action].forEach((listener) => {
+            listener(payload);
+        });
     }
 
-    send(data) {
-        let payload = JSON.stringify(data);
-        console.log('sending', payload);
-        this.socket.send(payload);
+    register(action, listener) {
+        if (!this.listeners[action]) {
+            this.listeners[action] = [];
+        }
+        this.listeners[action].push(listener);
     }
 }
 
-class RequestPlayerName {
-    constructor(webSocketHandler) {
-        this.webSocketHandler = webSocketHandler;
+class GameStore {
+    constructor(dispatcher) {
+        this.dispatcher = dispatcher;
+        this.dispatcher.register('REQUEST_PLAYER_NAME', pl => this.onRequestPlayerName(pl));
     }
 
-    act() {
+    onRequestPlayerName(payload) {
         let response = {};
         response.type = 'CHOOSE_PLAYER_NAME';
         response.data = 'js jass bot';
-        this.webSocketHandler.send(response);
-    }
+        this.dispatcher.emit('sendResponse', response);
 
+    }
 }
 
-let webSocketHandler = new WebSocketHandler('localhost:3000');
-webSocketHandler.onMessage(function (message) {
-    switch (message.type) {
-        case 'REQUEST_PLAYER_NAME':
-            let command = new RequestPlayerName(webSocketHandler);
-            command.act();
-            break;
-        default:
-            console.log(`unknonw message type ${message.type}`);
-    };
-});
+class WebSocketStore {
+    constructor(dispatcher) {
+        this.dispatcher = dispatcher;
+        dispatcher.register('sendResponse', (pl) => this.onSendResponse(pl))
+    }
+
+    connect(url) {
+        this.webSocket = new WebSocket(`ws://${url}`);
+        this.webSocket.onmessage = event => {
+            console.log('receiving', event.data);
+            let message = JSON.parse(event.data);
+            this.dispatcher.emit(message.type, message.data);
+        };
+    }
+
+    onSendResponse(data) {
+        let payload = JSON.stringify(data);
+        console.log('sending', payload);
+        this.webSocket.send(payload);
+    }
+}
+
+let dispatcher = new Dispatcher();
+let gameStore = new GameStore(dispatcher);
+let webSocketStore = new WebSocketStore(dispatcher);
+
+webSocketStore.connect('localhost:3000');
