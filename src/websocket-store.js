@@ -16,10 +16,10 @@ class WebSocketStore {
         };
     }
 
-    onSendResponse(data) {
-        let payload = JSON.stringify(data);
-        console.log('sending', payload);
-        this.webSocket.send(payload);
+    onSendResponse(payload) {
+        let content = JSON.stringify(payload);
+        console.log('sending', content);
+        this.webSocket.send(content);
     }
 }
 

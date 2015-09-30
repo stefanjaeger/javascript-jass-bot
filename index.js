@@ -7,8 +7,8 @@ let Dispatcher = require('./src/dispatcher');
 
 class Bot {
 
-    constructor(botName) {
-        this.botName = botName;
+    constructor(playerName) {
+        this.playerName = playerName;
     }
 
     withStrategy(Strategy) {
@@ -18,7 +18,7 @@ class Bot {
 
     connect(connectionstring) {
         let dispatcher = new Dispatcher();
-        let gameStore = new GameStore(dispatcher);
+        let gameStore = new GameStore(dispatcher, this.playerName, this.Strategy);
         let webSocketStore = new WebSocketStore(dispatcher);
 
         webSocketStore.connect(connectionstring);
