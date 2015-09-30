@@ -9,6 +9,12 @@ class BotAStrategy {
         response.trumpfColor = 'SPADES';
         return response;
     }
+    
+    static playCard(myCards, gameState) {
+        console.log(gameState);
+        // play random
+        return myCards[Math.floor(Math.random()*myCards.length)];
+    }
 }
 
 new Bot('A').withStrategy(BotAStrategy).connect('localhost:3000');

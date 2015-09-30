@@ -6,11 +6,15 @@ class GameStore {
         this.playerName = playerName;
         this.Strategy = Strategy;
         
+        this.gameState = {};
+        
         this.dispatcher.register('REQUEST_PLAYER_NAME', pl => this.onRequestPlayerName(pl));
         this.dispatcher.register('REQUEST_SESSION_CHOICE', pl => this.onRequestSessionChoise(pl));
         this.dispatcher.register('DEAL_CARDS', pl => this.onDealCards(pl));
         this.dispatcher.register('REQUEST_TRUMPF', pl => this.onRequestTrumpf(pl));
         this.dispatcher.register('BROADCAST_TRUMPF', pl => this.onBroadcastTrumpf(pl));
+        this.dispatcher.register('REQUEST_CARD', pl => this.onRequestCard(pl));
+        this.dispatcher.register('BROADCAST_STICH', pl => this.onBroadcastStitch(pl));
     }
 
     onRequestPlayerName(payload) {
@@ -42,8 +46,24 @@ class GameStore {
     }
     
     onBroadcastTrumpf(pl) {
-        this.currentTrumpfMode = pl.mode;
-        this.currentTrumpfColor = pl.trumpfColor;
+        this.gameState.currentTrumpfMode = pl.mode;
+        this.gameState.currentTrumpfColor = pl.trumpfColor;
+    }
+    
+    onRequestCard(pl) {
+        let response = {};
+        response.type = 'CHOOSE_CARD';
+        response.data = this.Strategy.playCard(this.myCards, this.gameState);
+        this.dispatcher.emit('sendResponse', response);
+    }
+    
+    onBroadcastStitch(pl) {
+        if(!this.gameState.stitch) {
+            this.gameState.stitch = [];
+        }
+        console.log(pl.playedCards);
+        // who played a card?!!
+        //this.gameState.stitch.push(pl.playedCards);
     }
 }
 
