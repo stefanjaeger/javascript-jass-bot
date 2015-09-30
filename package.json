@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "babel-core": "^5.8.22",
-    "systemjs": "^0.18.10"
+    "systemjs": "^0.18.10",
+    "ws": "^0.8.0"
   },
   "author": "Stefan Jaeger",
   "license": "ISC"
