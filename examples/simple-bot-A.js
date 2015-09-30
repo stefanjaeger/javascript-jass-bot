@@ -11,7 +11,6 @@ class BotAStrategy {
     }
     
     static playCard(myCards, gameState) {
-        console.log(gameState);
         // play random
         return myCards[Math.floor(Math.random()*myCards.length)];
     }

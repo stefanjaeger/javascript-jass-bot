@@ -14,6 +14,8 @@ class GameStore {
         this.dispatcher.register('REQUEST_TRUMPF', pl => this.onRequestTrumpf(pl));
         this.dispatcher.register('BROADCAST_TRUMPF', pl => this.onBroadcastTrumpf(pl));
         this.dispatcher.register('REQUEST_CARD', pl => this.onRequestCard(pl));
+        this.dispatcher.register('REJECT_CARD', pl => this.onRejectCard(pl));
+        this.dispatcher.register('PLAYED_CARDS', pl => this.onPlayedCards(pl));
         this.dispatcher.register('BROADCAST_STICH', pl => this.onBroadcastStitch(pl));
         this.dispatcher.register('BROADCAST_GAME_FINISHED', pl => this.onBroadcastGameFinished(pl));
     }
@@ -54,8 +56,20 @@ class GameStore {
     onRequestCard(pl) {
         let response = {};
         response.type = 'CHOOSE_CARD';
-        response.data = this.Strategy.playCard(this.myCards, this.gameState);
+        let cardToPlay = this.Strategy.playCard(this.myCards, this.gameState);
+        response.data = cardToPlay;
+        
+        this.myCards.splice(this.myCards.indexOf(cardToPlay), 1);
+        
         this.dispatcher.emit('sendResponse', response);
+    }
+    
+    onRejectCard(pl) {
+        this.myCards.push(pl);
+    }
+    
+    onPlayedCards(pl) {
+        // do nothing right now
     }
     
     onBroadcastStitch(pl) {
