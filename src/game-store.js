@@ -15,6 +15,7 @@ class GameStore {
         this.dispatcher.register('BROADCAST_TRUMPF', pl => this.onBroadcastTrumpf(pl));
         this.dispatcher.register('REQUEST_CARD', pl => this.onRequestCard(pl));
         this.dispatcher.register('BROADCAST_STICH', pl => this.onBroadcastStitch(pl));
+        this.dispatcher.register('BROADCAST_GAME_FINISHED', pl => this.onBroadcastGameFinished(pl));
     }
 
     onRequestPlayerName(payload) {
@@ -61,9 +62,11 @@ class GameStore {
         if(!this.gameState.stitch) {
             this.gameState.stitch = [];
         }
-        console.log(pl.playedCards);
-        // who played a card?!!
-        //this.gameState.stitch.push(pl.playedCards);
+        this.gameState.stitch.push(pl.playedCards);
+    }
+    
+    onBroadcastGameFinished(pl) {
+        this.gameState = {};
     }
 }
 
