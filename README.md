@@ -1,6 +1,9 @@
 # javascript-jass-bot
 Javascript Client for https://github.com/webplatformz/challenge
 
+## Requirements
+- Node v4.x.x or higher
+
 ## Installation
 todo
 
