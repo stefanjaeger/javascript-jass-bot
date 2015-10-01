@@ -5,9 +5,9 @@ class GameStore {
         this.dispatcher = dispatcher;
         this.playerName = playerName;
         this.strategy = strategy;
-        
+
         this.gameState = {};
-        
+
         this.dispatcher.register('debug', (pl) => this.onDebug(pl));
         this.dispatcher.register('REQUEST_PLAYER_NAME', pl => this.onRequestPlayerName(pl));
         this.dispatcher.register('REQUEST_SESSION_CHOICE', pl => this.onRequestSessionChoise(pl));
@@ -35,7 +35,7 @@ class GameStore {
         response.data = this.playerName;
         this.dispatcher.emit('sendResponse', response);
     }
-    
+
     onRequestSessionChoise(pl) {
         let response = {};
         response.type = 'CHOOSE_SESSION';
@@ -45,79 +45,84 @@ class GameStore {
         response.data.sessionType = 'TOURNAMENT';
         this.dispatcher.emit('sendResponse', response);
     }
-    
+
     onBroadcastSessionJoined(pl) {
         // do nothing right now
     }
-    
+
     onBroadcastTeams(pl) {
         // do nothing right now
     }
-    
+
     onDealCards(payload) {
         this.myCards = payload;
     }
-    
+
     onRequestTrumpf(pl) {
         let response = {};
         response.type = 'CHOOSE_TRUMPF';
         response.data = this.strategy.requestTrumpf(this.myCards);
         this.dispatcher.emit('sendResponse', response);
     }
-    
+
     onBroadcastTrumpf(pl) {
         this.gameState.currentTrumpfMode = pl.mode;
         this.gameState.currentTrumpfColor = pl.trumpfColor;
     }
-    
+
     onRequestCard(pl) {
         // fallback. After 5 retries (e.g. bot sends always same card), choose card by our own
         let cardToPlay = (this.rejectCounter && this.rejectCounter >= 5) ? this.playCardFallback(pl) : this.strategy.playCard(this.myCards, pl, this.gameState);
-        
+
         let response = {};
         response.type = 'CHOOSE_CARD';
         response.data = cardToPlay;
-        
+
         this.myCards.splice(this.myCards.indexOf(cardToPlay), 1);
-        
+
         this.dispatcher.emit('sendResponse', response);
     }
-    
+
     playCardFallback(pl) {
         // fallback is quite simple, just try a random card for so long until it's working
         // (without this fallback, our game could get stuck)
-        if (this.rejectCounter == 5) console.error(`BOT FAILURE!! using fallback (random card), because Bot played 5 times an invalid card. Some debug infos: \nmyCards:${JSON.stringify(this.myCards)} \nplayedCards:${JSON.stringify(pl)} \ngameState: ${JSON.stringify(this.gameState)})`);
-        return this.myCards[Math.floor(Math.random()*this.myCards.length)];
+        if (this.rejectCounter == 5) {
+            let errorMessage = `BOT FAILURE!! using fallback (random card), because Bot played 5 times an invalid card. Some debug infos: \nmyCards:${JSON.stringify(this.myCards)} \nplayedCards:${JSON.stringify(pl)} \ngameState: ${JSON.stringify(this.gameState)})`;
+            if (this.debug) console.log(errorMessage);
+            if (this.strategy.notifyError) this.strategy.notifyError(errorMessage);
+        }
+        return this.myCards[Math.floor(Math.random() * this.myCards.length)];
     }
-    
+
     onRejectCard(pl) {
         this.myCards.push(pl);
         this.rejectCounter++;
     }
-    
+
     onPlayedCards(pl) {
         // do nothing right now
     }
-    
+
     onBroadcastStitch(pl) {
         this.rejectCounter = 0;
-            
-        if(!this.gameState.stitch) {
+
+        if (!this.gameState.stitch) {
             this.gameState.stitch = [];
         }
         this.gameState.stitch.push(pl.playedCards);
     }
-    
+
     onBroadcastGameFinished(pl) {
         this.gameState = {};
+        if (this.strategy.gameFinished) this.strategy.gameFinished(pl);
         if (this.debug) console.log('single game finished', pl);
     }
-    
+
     onBroadcastWinnerTeam(pl) {
         if (this.debug) console.log('all games finished', pl);
         this.dispatcher.emit('closeConnection');
     }
-    
+
     onBadMessage(pl) {
         console.error('bad message:', pl);
     }
