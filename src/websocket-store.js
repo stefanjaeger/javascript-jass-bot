@@ -9,6 +9,7 @@ class WebSocketStore {
         this.dispatcher.register('debug', (pl) => this.onDebug(pl));
         this.dispatcher.register('connectJassServer', (pl) => this.onConnectJassServer(pl));
         this.dispatcher.register('sendResponse', (pl) => this.onSendResponse(pl));
+        this.dispatcher.register('closeConnection', (pl) => this.onCloseConnection(pl));
     }
 
     onDebug(pl) {
@@ -18,20 +19,20 @@ class WebSocketStore {
     onConnectJassServer(pl) {
         this.webSocket = new WebSocket(`ws://${pl}`);
         this.webSocket.onmessage = event => {
-            if (this.debug) {
-                console.log('receiving', event.data)
-            };
+            if (this.debug) console.log('WS receiving', event.data);
             let message = JSON.parse(event.data);
             this.dispatcher.emit(message.type, message.data);
         };
     }
 
-    onSendResponse(payload) {
-        let content = JSON.stringify(payload);
-        if (this.debug) {
-            console.log('sending', content);
-        };
+    onSendResponse(pl) {
+        let content = JSON.stringify(pl);
+        if (this.debug) console.log('WS sending', content);
         this.webSocket.send(content);
+    }
+    
+    onCloseConnection(pl) {
+        this.webSocket.close();
     }
 }
 

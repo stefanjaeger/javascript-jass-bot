@@ -1,15 +1,18 @@
 'use strict';
 
 class GameStore {
-    constructor(dispatcher, playerName, Strategy) {
+    constructor(dispatcher, playerName, strategy) {
         this.dispatcher = dispatcher;
         this.playerName = playerName;
-        this.Strategy = Strategy;
+        this.strategy = strategy;
         
         this.gameState = {};
         
+        this.dispatcher.register('debug', (pl) => this.onDebug(pl));
         this.dispatcher.register('REQUEST_PLAYER_NAME', pl => this.onRequestPlayerName(pl));
         this.dispatcher.register('REQUEST_SESSION_CHOICE', pl => this.onRequestSessionChoise(pl));
+        this.dispatcher.register('BROADCAST_SESSION_JOINED', pl => this.onBroadcastSessionJoined(pl));
+        this.dispatcher.register('BROADCAST_TEAMS', pl => this.onBroadcastTeams(pl));
         this.dispatcher.register('DEAL_CARDS', pl => this.onDealCards(pl));
         this.dispatcher.register('REQUEST_TRUMPF', pl => this.onRequestTrumpf(pl));
         this.dispatcher.register('BROADCAST_TRUMPF', pl => this.onBroadcastTrumpf(pl));
@@ -18,16 +21,21 @@ class GameStore {
         this.dispatcher.register('PLAYED_CARDS', pl => this.onPlayedCards(pl));
         this.dispatcher.register('BROADCAST_STICH', pl => this.onBroadcastStitch(pl));
         this.dispatcher.register('BROADCAST_GAME_FINISHED', pl => this.onBroadcastGameFinished(pl));
+        this.dispatcher.register('BROADCAST_WINNER_TEAM', pl => this.onBroadcastWinnerTeam(pl));
     }
 
-    onRequestPlayerName(payload) {
+    onDebug(pl) {
+        this.debug = pl;
+    }
+
+    onRequestPlayerName(pl) {
         let response = {};
         response.type = 'CHOOSE_PLAYER_NAME';
         response.data = this.playerName;
         this.dispatcher.emit('sendResponse', response);
     }
     
-    onRequestSessionChoise(payload) {
+    onRequestSessionChoise(pl) {
         let response = {};
         response.type = 'CHOOSE_SESSION';
         response.data = {};
@@ -37,14 +45,22 @@ class GameStore {
         this.dispatcher.emit('sendResponse', response);
     }
     
+    onBroadcastSessionJoined(pl) {
+        // do nothing right now
+    }
+    
+    onBroadcastTeams(pl) {
+        // do nothing right now
+    }
+    
     onDealCards(payload) {
         this.myCards = payload;
     }
     
-    onRequestTrumpf(payload) {
+    onRequestTrumpf(pl) {
         let response = {};
         response.type = 'CHOOSE_TRUMPF';
-        response.data = this.Strategy.requestTrumpf(this.myCards);
+        response.data = this.strategy.requestTrumpf(this.myCards);
         this.dispatcher.emit('sendResponse', response);
     }
     
@@ -56,7 +72,7 @@ class GameStore {
     onRequestCard(pl) {
         let response = {};
         response.type = 'CHOOSE_CARD';
-        let cardToPlay = this.Strategy.playCard(this.myCards, this.gameState);
+        let cardToPlay = this.strategy.playCard(this.myCards, this.gameState);
         response.data = cardToPlay;
         
         this.myCards.splice(this.myCards.indexOf(cardToPlay), 1);
@@ -83,6 +99,11 @@ class GameStore {
     
     onBroadcastGameFinished(pl) {
         this.gameState = {};
+    }
+    
+    onBroadcastWinnerTeam(pl) {
+        if (this.debug) console.log('game result:', pl);
+        this.dispatcher.emit('closeConnection');
     }
 }
 

@@ -11,14 +11,14 @@ class Bot {
         this.playerName = playerName;
     }
 
-    withStrategy(Strategy) {
-        this.Strategy = Strategy;
+    withStrategy(strategy) {
+        this.strategy = strategy;
         return this;
     }
 
     connect(connectionstring) {
         let dispatcher = new Dispatcher();
-        let gameStore = new GameStore(dispatcher, this.playerName, this.Strategy);
+        let gameStore = new GameStore(dispatcher, this.playerName, this.strategy);
         let webSocketStore = new WebSocketStore(dispatcher);
 
         dispatcher.emit('debug', false);
