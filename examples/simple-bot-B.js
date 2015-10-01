@@ -9,7 +9,7 @@ class BotBStrategy {
         return response;
     }
     
-    playCard(myCards, gameState) {
+    playCard(myCards, playedCards, gameState) {
         // play random
         return myCards[Math.floor(Math.random()*myCards.length)];
     }

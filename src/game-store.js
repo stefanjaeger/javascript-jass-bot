@@ -22,6 +22,7 @@ class GameStore {
         this.dispatcher.register('BROADCAST_STICH', pl => this.onBroadcastStitch(pl));
         this.dispatcher.register('BROADCAST_GAME_FINISHED', pl => this.onBroadcastGameFinished(pl));
         this.dispatcher.register('BROADCAST_WINNER_TEAM', pl => this.onBroadcastWinnerTeam(pl));
+        this.dispatcher.register('BAD_MESSAGE', pl => this.onBadMessage(pl));
     }
 
     onDebug(pl) {
@@ -70,9 +71,11 @@ class GameStore {
     }
     
     onRequestCard(pl) {
+        // fallback. After 5 retries (e.g. bot sends always same card), choose card by our own
+        let cardToPlay = (this.rejectCounter && this.rejectCounter >= 5) ? this.playCardFallback(pl) : this.strategy.playCard(this.myCards, pl, this.gameState);
+        
         let response = {};
         response.type = 'CHOOSE_CARD';
-        let cardToPlay = this.strategy.playCard(this.myCards, this.gameState);
         response.data = cardToPlay;
         
         this.myCards.splice(this.myCards.indexOf(cardToPlay), 1);
@@ -80,17 +83,25 @@ class GameStore {
         this.dispatcher.emit('sendResponse', response);
     }
     
+    playCardFallback(pl) {
+        // fallback is quite simple, just try a random card for so long until it's working
+        // (without this fallback, our game could get stuck)
+        if (this.rejectCounter == 5) console.error(`BOT FAILURE!! using fallback (random card), because Bot played 5 times a not allowed card. Some debug infos: \nmyCards:${JSON.stringify(this.myCards)} \nplayedCards:${JSON.stringify(pl)} \ngameState: ${JSON.stringify(this.gameState)})`);
+        return this.myCards[Math.floor(Math.random()*this.myCards.length)];
+    }
+    
     onRejectCard(pl) {
         this.myCards.push(pl);
+        this.rejectCounter++;
     }
     
     onPlayedCards(pl) {
-        this.gameState.playedCards = pl;
+        // do nothing right now
     }
     
     onBroadcastStitch(pl) {
-        this.gameState.playedCards = [];
-        
+        this.rejectCounter = 0;
+            
         if(!this.gameState.stitch) {
             this.gameState.stitch = [];
         }
@@ -99,11 +110,16 @@ class GameStore {
     
     onBroadcastGameFinished(pl) {
         this.gameState = {};
+        if (this.debug) console.log('single game finished', pl);
     }
     
     onBroadcastWinnerTeam(pl) {
-        if (this.debug) console.log('game result:', pl);
+        if (this.debug) console.log('all games finished', pl);
         this.dispatcher.emit('closeConnection');
+    }
+    
+    onBadMessage(pl) {
+        console.error('bad message:', pl);
     }
 }
 
