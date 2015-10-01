@@ -4,11 +4,13 @@ var WebSocket = require('ws');
 class WebSocketStore {
     constructor(dispatcher) {
         this.dispatcher = dispatcher;
-        dispatcher.register('sendResponse', (pl) => this.onSendResponse(pl))
+        
+        this.dispatcher.register('connectJassServer', (pl) => this.onConnectJassServer(pl));
+        this.dispatcher.register('sendResponse', (pl) => this.onSendResponse(pl));
     }
 
-    connect(url) {
-        this.webSocket = new WebSocket(`ws://${url}`);
+    onConnectJassServer(pl) {
+        this.webSocket = new WebSocket(`ws://${pl}`);
         this.webSocket.onmessage = event => {
             console.log('receiving', event.data);
             let message = JSON.parse(event.data);
