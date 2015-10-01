@@ -1,7 +1,8 @@
 {
   "name": "javascript-jass-bot",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "javascript jass bot for https://github.com/webplatformz/challenge",
+  "private": true,
   "scripts": {
     "prestart": "npm i",
     "start": "parallelshell \"npm run runBotA\" \"npm run runBotA\" \"npm run runBotB\" \"npm run runBotB\"",
