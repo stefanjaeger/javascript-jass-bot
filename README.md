@@ -2,7 +2,7 @@
 Javascript Client for https://github.com/webplatformz/challenge
 
 ## Requirements
-- Node v4.x.x or higher
+- Node v4.1.x or higher
 
 ## Installation
 todo
