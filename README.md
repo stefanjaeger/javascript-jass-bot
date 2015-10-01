@@ -26,6 +26,15 @@ class BotStrategy {
         // e.g. play random
         return myCards[Math.floor(Math.random()*myCards.length)];
     }
+    
+    
+    gameFinished(data) {
+        console.log(data);
+    }
+
+    notifyError(error) {
+        console.log(error);
+    }
 }
 
 new Bot('BotName').withStrategy(new BotStrategy()).connect('localhost:3000');
