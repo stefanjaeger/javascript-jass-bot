@@ -69,10 +69,12 @@ class GameStore {
     }
     
     onPlayedCards(pl) {
-        // do nothing right now
+        this.gameState.playedCards = pl;
     }
     
     onBroadcastStitch(pl) {
+        this.gameState.playedCards = [];
+        
         if(!this.gameState.stitch) {
             this.gameState.stitch = [];
         }
