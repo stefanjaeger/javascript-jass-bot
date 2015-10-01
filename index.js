@@ -21,6 +21,7 @@ class Bot {
         let gameStore = new GameStore(dispatcher, this.playerName, this.Strategy);
         let webSocketStore = new WebSocketStore(dispatcher);
 
+        dispatcher.emit('debug', false);
         dispatcher.emit('connectJassServer', connectionstring);
     }
 }
