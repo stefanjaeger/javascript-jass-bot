@@ -86,7 +86,7 @@ class GameStore {
     playCardFallback(pl) {
         // fallback is quite simple, just try a random card for so long until it's working
         // (without this fallback, our game could get stuck)
-        if (this.rejectCounter == 5) console.error(`BOT FAILURE!! using fallback (random card), because Bot played 5 times a not allowed card. Some debug infos: \nmyCards:${JSON.stringify(this.myCards)} \nplayedCards:${JSON.stringify(pl)} \ngameState: ${JSON.stringify(this.gameState)})`);
+        if (this.rejectCounter == 5) console.error(`BOT FAILURE!! using fallback (random card), because Bot played 5 times an invalid card. Some debug infos: \nmyCards:${JSON.stringify(this.myCards)} \nplayedCards:${JSON.stringify(pl)} \ngameState: ${JSON.stringify(this.gameState)})`);
         return this.myCards[Math.floor(Math.random()*this.myCards.length)];
     }
     
