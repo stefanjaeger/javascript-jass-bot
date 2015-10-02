@@ -124,7 +124,8 @@ class GameStore {
     }
 
     onBadMessage(pl) {
-        console.error('bad message:', pl);
+        if (this.debug) cconsole.error('bad message:', pl);
+        if (this.strategy.notifyError) this.strategy.notifyError(pl);
     }
 }
 
