@@ -1,6 +1,6 @@
 {
   "name": "javascript-jass-bot",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "javascript jass bot for https://github.com/webplatformz/challenge",
   "scripts": {
     "prestart": "npm i",
