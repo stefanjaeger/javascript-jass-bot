@@ -71,6 +71,8 @@ class GameStore {
     }
 
     onRequestCard(pl) {
+        this.gameState.lastPlayerPosition = pl.length;
+        
         // fallback. After 5 retries (e.g. bot sends always same card), choose card by our own
         let cardToPlay = (this.rejectCounter && this.rejectCounter >= 5) ? this.playCardFallback(pl) : this.strategy.playCard(this.myCards, pl, this.gameState);
 
@@ -108,7 +110,9 @@ class GameStore {
 
         if (!this.gameState.stitch) {
             this.gameState.stitch = [];
+            this.gameState.stitchPlayerPosition = [];
         }
+        this.gameState.stitchPlayerPosition.push(this.gameState.lastPlayerPosition);
         this.gameState.stitch.push(pl.playedCards);
     }
 
