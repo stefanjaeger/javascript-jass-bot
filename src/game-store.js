@@ -7,6 +7,7 @@ class GameStore {
         this.strategy = strategy;
 
         this.gameState = {};
+        this.rejectCounter = 0;
 
         this.dispatcher.register('debug', (pl) => this.onDebug(pl));
         this.dispatcher.register('REQUEST_PLAYER_NAME', pl => this.onRequestPlayerName(pl));
@@ -23,6 +24,7 @@ class GameStore {
         this.dispatcher.register('BROADCAST_GAME_FINISHED', pl => this.onBroadcastGameFinished(pl));
         this.dispatcher.register('BROADCAST_WINNER_TEAM', pl => this.onBroadcastWinnerTeam(pl));
         this.dispatcher.register('BAD_MESSAGE', pl => this.onBadMessage(pl));
+        this.dispatcher.register('BROADCAST_TOURNAMENT_RANKING_TABLE', pl => this.onBroadcastTournamentRankingTable(pl));
     }
 
     onDebug(pl) {
@@ -125,6 +127,10 @@ class GameStore {
     onBroadcastWinnerTeam(pl) {
         if (this.debug) console.log('all games finished', pl);
         this.dispatcher.emit('closeConnection');
+    }
+    
+    onBroadcastTournamentRankingTable(pl) {
+        // do nothing right now
     }
 
     onBadMessage(pl) {
