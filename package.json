@@ -1,6 +1,6 @@
 {
   "name": "javascript-jass-bot",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "javascript jass bot for https://github.com/webplatformz/challenge",
   "scripts": {
     "prestart": "npm i",
@@ -15,5 +15,13 @@
     "parallelshell": "^2.0.0"
   },
   "author": "Stefan Jaeger",
-  "license": "ISC"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://stefanjaeger@github.com/stefanjaeger/javascript-jass-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/stefanjaeger/javascript-jass-bot/issues"
+  },
+  "homepage": "https://github.com/stefanjaeger/javascript-jass-bot"
 }
