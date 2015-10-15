@@ -126,12 +126,13 @@ class GameStore {
 
     onBroadcastWinnerTeam(pl) {
         if (this.debug) console.log('all games finished', pl);
-        this.dispatcher.emit('closeConnection');
     }
     
     onBroadcastTournamentRankingTable(pl) {
         // do nothing right now
     }
+    
+    // TODO: onBroadcastTournamentFinished: this.dispatcher.emit('closeConnection');
 
     onBadMessage(pl) {
         if (this.debug) cconsole.error('bad message:', pl);
